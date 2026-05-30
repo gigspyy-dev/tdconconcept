@@ -1,262 +1,1331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thrudark — Customer Experience</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0f0f0f; color: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; height: 100vh; display: flex; flex-direction: column; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>THRUDARK — CX Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* NAV */
-  nav { background: #111; border-bottom: 1px solid #222; padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
-  .brand { font-size: 18px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
-  .brand span { color: #4a5e3a; }
-  .brand-sub { font-size: 11px; color: #666; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
-  .brand-block { display: flex; flex-direction: column; }
-  .stat-pill { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px; }
-  .stat-pill b { color: #fff; }
-  .stat-pill.urgent { border-color: #f0a50044; }
-  .stat-pill.urgent b { color: #f0a500; }
-  .stat-pill.esc { border-color: #c0392b44; }
-  .stat-pill.esc b { color: #e74c3c; }
-  nav .spacer { flex: 1; }
+    :root {
+      /* Core palette — black-on-black stealth */
+      --black:       #000000;
+      --bg:          #080808;
+      --surface:     #0e0e0e;
+      --surface2:    #141414;
+      --surface3:    #1a1a1a;
+      --border:      #1e1e1e;
+      --border2:     #282828;
 
-  /* LAYOUT */
-  .workspace { display: flex; flex: 1; overflow: hidden; }
+      /* Text */
+      --text:        #e8e4dc;
+      --text2:       #a09890;
+      --text3:       #585450;
+      --text-inv:    #080808;
 
-  /* SIDEBAR */
-  aside { width: 200px; flex-shrink: 0; background: #111; border-right: 1px solid #1e1e1e; padding: 16px 12px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-  .sidebar-section h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 8px; padding: 0 4px; }
-  .filter-btn { display: block; width: 100%; text-align: left; background: none; border: none; color: #aaa; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.15s; }
-  .filter-btn:hover { background: #1a1a1a; color: #fff; }
-  .filter-btn.active { background: #1e2a1a; color: #7aad5a; font-weight: 600; }
-  .process-all-btn { margin-top: auto; background: #4a5e3a; color: #fff; border: none; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; }
+      /* Brand accent — military olive */
+      --olive:       #3e5426;
+      --olive-mid:   #4d6830;
+      --olive-light: #6a8f42;
+      --olive-dim:   #1e2a12;
 
-  /* TICKET LIST */
-  .ticket-list { width: 340px; flex-shrink: 0; border-right: 1px solid #1e1e1e; overflow-y: auto; }
-  .list-header { padding: 14px 16px; border-bottom: 1px solid #1e1e1e; display: flex; align-items: center; justify-content: space-between; }
-  .list-header h3 { font-size: 13px; font-weight: 600; color: #ccc; }
-  .list-header span { font-size: 12px; color: #555; }
-  .ticket-card { padding: 14px 16px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: background 0.1s; }
-  .ticket-card:hover { background: #161616; }
-  .ticket-card.selected { background: #1a2a18; border-left: 3px solid #4a5e3a; }
-  .tc-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .tc-name { font-weight: 600; font-size: 13px; color: #e0e0e0; flex: 1; }
-  .badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .badge.urgent { background: #f0a50022; color: #f0a500; border: 1px solid #f0a50044; }
-  .badge.high { background: #e6721222; color: #e67212; border: 1px solid #e6721244; }
-  .badge.medium { background: #3a4a5e22; color: #7a9ac0; border: 1px solid #3a4a5e44; }
-  .badge.low { background: #2a2a2a; color: #666; border: 1px solid #333; }
-  .badge.open { background: #3a4a5e22; color: #7a9ac0; border: 1px solid #3a4a5e44; }
-  .badge.complaint { background: #c0392b22; color: #e74c3c; border: 1px solid #c0392b44; }
-  .badge.warranty { background: #8e44ad22; color: #bb8fce; border: 1px solid #8e44ad44; }
-  .badge.order_status { background: #27ae6022; color: #5dade2; border: 1px solid #27ae6044; }
-  .badge.shipping_issue { background: #d3534122; color: #ec7063; border: 1px solid #d3534144; }
-  .badge.return_exchange { background: #d4ac0d22; color: #f4d03f; border: 1px solid #d4ac0d44; }
-  .badge.product_query { background: #1a8a3a22; color: #58d68d; border: 1px solid #1a8a3a44; }
-  .badge.feedback { background: #2a2a2a; color: #aaa; border: 1px solid #333; }
-  .badge.other { background: #2a2a2a; color: #888; border: 1px solid #333; }
-  .tc-subject { font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
-  .tc-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
-  .channel-icon { font-size: 11px; }
-  .esc-flag { color: #e74c3c; font-size: 11px; }
-  .rep-tag { background: #1e1e1e; padding: 1px 6px; border-radius: 8px; font-size: 10px; color: #888; }
+      /* Status colours — desaturated, tactical */
+      --amber:       #c8963c;
+      --amber-dim:   #1e1608;
+      --red:         #8b2020;
+      --red-mid:     #a83232;
+      --red-light:   #d45050;
+      --red-dim:     #180c0c;
+      --blue:        #2a5070;
+      --blue-light:  #4a8aac;
+      --blue-dim:    #0c1820;
+      --green:       #2a5030;
+      --green-light: #4a8a5a;
+      --green-dim:   #0c180e;
 
-  /* DETAIL PANEL */
-  .detail-panel { flex: 1; overflow-y: auto; padding: 24px; }
-  .detail-panel.empty { display: flex; align-items: center; justify-content: center; color: #333; font-size: 15px; }
-  .detail-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
-  .detail-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .detail-meta { font-size: 12px; color: #666; display: flex; gap: 12px; flex-wrap: wrap; }
-  .detail-meta span { display: flex; align-items: center; gap: 4px; }
-  .esc-banner { background: #c0392b22; border: 1px solid #c0392b66; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; color: #e74c3c; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-  .body-box { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.7; color: #bbb; white-space: pre-wrap; margin-bottom: 20px; }
-  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 8px; font-weight: 600; }
-  .draft-box { background: #141414; border: 1px solid #2a3a22; border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.7; color: #c8d8b8; white-space: pre-wrap; margin-bottom: 20px; font-style: italic; }
-  .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .btn { padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
-  .btn:hover { opacity: 0.85; }
-  .btn.primary { background: #4a5e3a; color: #fff; }
-  .btn.secondary { background: #1e1e1e; color: #aaa; border: 1px solid #333; }
-  .btn.danger { background: #c0392b22; color: #e74c3c; border: 1px solid #c0392b44; }
-  .status-select { background: #1a1a1a; color: #ccc; border: 1px solid #333; border-radius: 7px; padding: 7px 10px; font-size: 13px; }
-  .classify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-  .classify-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 12px 14px; }
-  .classify-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 4px; }
-  .classify-card .value { font-size: 14px; font-weight: 600; color: #e0e0e0; }
-  .rep-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .rep-avatar { width: 36px; height: 36px; border-radius: 50%; background: #4a5e3a; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0; }
-  .rep-info .name { font-weight: 600; color: #e0e0e0; margin-bottom: 2px; }
-  .rep-info .sub { font-size: 11px; color: #666; }
-</style>
+      /* Typography */
+      --font-heading: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      --font-body:    'Barlow', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── TOPBAR ───────────────────────────────────────────────────────────── */
+
+    .topbar {
+      height: 52px;
+      background: var(--black);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      position: relative;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 24px;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .brand-wordmark {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .brand-wordmark em {
+      color: var(--olive-light);
+      font-style: normal;
+    }
+
+    .brand-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border2);
+      margin: 0 14px;
+    }
+
+    .brand-module {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .topbar-stats {
+      display: flex;
+      align-items: stretch;
+      flex: 1;
+      padding: 0 20px;
+      gap: 0;
+    }
+
+    .stat-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+      cursor: default;
+    }
+
+    .stat-block:first-child { padding-left: 0; }
+
+    .stat-val {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 24px;
+      line-height: 1;
+      color: var(--text);
+      min-width: 2ch;
+    }
+
+    .stat-val.urgent-val { color: var(--amber); }
+    .stat-val.esc-val    { color: var(--red-light); }
+
+    .stat-label {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text3);
+      line-height: 1.3;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      margin-left: auto;
+      gap: 8px;
+    }
+
+    .refresh-indicator {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── LAYOUT ───────────────────────────────────────────────────────────── */
+
+    .app-shell {
+      display: flex;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+
+    /* ─── SIDEBAR ──────────────────────────────────────────────────────────── */
+
+    .sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: var(--black);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0 8px;
+    }
+
+    .sidebar-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text3);
+      padding: 0 16px;
+      margin-bottom: 6px;
+    }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text2);
+      padding: 7px 16px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.1s, background 0.1s;
+      text-align: left;
+    }
+
+    .filter-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .filter-btn.active {
+      color: var(--text);
+      background: var(--surface2);
+      border-left: 2px solid var(--olive-light);
+      padding-left: 14px;
+    }
+
+    .filter-btn .f-count {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    .filter-btn.active .f-count {
+      color: var(--olive-light);
+    }
+
+    .sidebar-cta {
+      padding: 16px;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+    }
+
+    .process-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--olive);
+      border: 1px solid var(--olive-mid);
+      color: var(--text);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .process-btn:hover:not(:disabled) { background: var(--olive-mid); }
+    .process-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .process-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ─── TICKET LIST ──────────────────────────────────────────────────────── */
+
+    .list-panel {
+      width: 340px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .list-header {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .list-header-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text2);
+    }
+
+    .list-header-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .ticket-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .ticket-card {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+      position: relative;
+    }
+
+    .ticket-card:hover { background: var(--surface); }
+
+    .ticket-card.selected {
+      background: var(--surface2);
+      border-left: 2px solid var(--olive-light);
+      padding-left: 14px;
+    }
+
+    .ticket-card.escalated {
+      border-left: 2px solid var(--red-mid);
+      padding-left: 14px;
+    }
+
+    .ticket-card.escalated.selected {
+      border-left: 2px solid var(--red-light);
+    }
+
+    .tc-row1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .tc-name {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tc-badges {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .tc-subject {
+      font-size: 12px;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 7px;
+    }
+
+    .tc-foot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .tc-channel {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 5px;
+      border: 1px solid var(--border2);
+      color: var(--text3);
+    }
+
+    .tc-rep {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .tc-time {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    /* ─── BADGES ───────────────────────────────────────────────────────────── */
+
+    .badge {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    /* Priority */
+    .b-low      { background: var(--surface3); color: var(--text3); border: 1px solid var(--border2); }
+    .b-medium   { background: var(--blue-dim);  color: var(--blue-light); border: 1px solid var(--blue); }
+    .b-high     { background: var(--amber-dim); color: var(--amber); border: 1px solid #3a2a10; }
+    .b-urgent   { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); font-size: 9px; }
+
+    /* Status */
+    .b-open        { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
+    .b-in_progress { background: var(--olive-dim); color: var(--olive-light); border: 1px solid var(--olive); }
+    .b-resolved    { background: var(--green-dim); color: var(--green-light); border: 1px solid var(--green); }
+
+    /* Category */
+    .b-cat { background: transparent; color: var(--text3); border: 1px solid var(--border); font-size: 9px; }
+
+    /* Escalation dot */
+    .esc-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red-mid);
+      flex-shrink: 0;
+      box-shadow: 0 0 6px var(--red-mid);
+    }
+
+    /* ─── DETAIL PANEL ─────────────────────────────────────────────────────── */
+
+    .detail-panel {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      opacity: 0.12;
+    }
+
+    .empty-state p {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    /* Detail content */
+    .detail-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detail-toprow {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .detail-id-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .detail-ticket-id {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.04em;
+    }
+
+    .detail-time {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .detail-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .detail-badge-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Process button in detail */
+    .action-process-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      background: var(--olive);
+      border: 1px solid var(--olive-mid);
+      color: var(--text);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .action-process-btn:hover:not(:disabled) { background: var(--olive-mid); }
+    .action-process-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Escalation banner */
+    .esc-banner {
+      background: var(--red-dim);
+      border: 1px solid var(--red);
+      border-left: 3px solid var(--red-light);
+      padding: 12px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .esc-banner-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      fill: none;
+      stroke: var(--red-light);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .esc-banner-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--red-light);
+      margin-bottom: 3px;
+    }
+
+    .esc-banner-reason {
+      font-size: 12px;
+      color: #c07070;
+      line-height: 1.4;
+    }
+
+    /* Info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .info-cell {
+      background: var(--surface);
+      padding: 10px 14px;
+    }
+
+    .info-cell-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 4px;
+    }
+
+    .info-cell-val {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .info-cell-val.mono {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text2);
+    }
+
+    /* Section heading */
+    .section-heading {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text3);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    /* Message body */
+    .message-body {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--border2);
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text2);
+      white-space: pre-wrap;
+      font-family: var(--font-body);
+    }
+
+    /* Draft reply */
+    .draft-wrapper {
+      position: relative;
+    }
+
+    .draft-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .draft-ai-badge {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: var(--olive-dim);
+      color: var(--olive-light);
+      border: 1px solid var(--olive);
+      padding: 2px 7px;
+    }
+
+    textarea.draft-reply {
+      width: 100%;
+      min-height: 170px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-left: 2px solid var(--olive);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.65;
+      padding: 14px 16px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea.draft-reply:focus {
+      border-color: var(--olive-mid);
+      border-left-color: var(--olive-light);
+    }
+
+    textarea.draft-reply::placeholder {
+      color: var(--text3);
+    }
+
+    /* Actions bar */
+    .actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+
+    select.status-select {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 7px 10px;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23585450' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    select.status-select:focus { border-color: var(--olive-mid); }
+
+    .act-btn {
+      padding: 7px 14px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: opacity 0.15s;
+    }
+
+    .act-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .act-primary  { background: var(--olive);    border-color: var(--olive-mid); color: var(--text); }
+    .act-primary:hover:not(:disabled) { background: var(--olive-mid); }
+
+    .act-resolve  { background: transparent; border-color: var(--green); color: var(--green-light); }
+    .act-resolve:hover:not(:disabled) { background: var(--green-dim); }
+
+    /* ─── SPINNER / OVERLAY ────────────────────────────────────────────────── */
+
+    .spinner {
+      display: none;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--olive-light);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.on { display: flex; }
+
+    .overlay-box {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      min-width: 280px;
+    }
+
+    .overlay-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border2);
+      border-top-color: var(--olive-light);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .overlay-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text2);
+    }
+
+    .overlay-sub {
+      font-size: 12px;
+      color: var(--text3);
+      text-align: center;
+    }
+
+    /* ─── TOAST ────────────────────────────────────────────────────────────── */
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--olive-mid);
+      padding: 10px 16px;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      z-index: 600;
+      transform: translateY(10px);
+      opacity: 0;
+      transition: all 0.2s;
+      pointer-events: none;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.t-error { border-left-color: var(--red-mid); }
+    .toast.t-success { border-left-color: var(--olive-light); }
+
+    /* ─── SCROLLBARS ───────────────────────────────────────────────────────── */
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); }
+
+    /* ─── UTILS ────────────────────────────────────────────────────────────── */
+
+    .sep { flex: 1; }
+  </style>
 </head>
 <body>
 
-<nav>
-  <div class="brand-block">
-    <div class="brand">THRU<span>DARK</span></div>
-    <div class="brand-sub">Customer Experience</div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <span class="brand-wordmark">THRU<em>DARK</em></span>
+    <span class="brand-divider"></span>
+    <span class="brand-module">CX Operations</span>
   </div>
-  <div class="spacer"></div>
-  <div class="stat-pill"><b id="s-open">12</b> open</div>
-  <div class="stat-pill urgent"><b id="s-urgent">0</b> urgent</div>
-  <div class="stat-pill esc"><b id="s-esc">0</b> escalations</div>
-</nav>
-
-<div class="workspace">
-  <aside>
-    <div class="sidebar-section">
-      <h4>Rep</h4>
-      <button class="filter-btn active" onclick="setFilter('rep','all',this)">All reps</button>
-      <button class="filter-btn" onclick="setFilter('rep','rep1',this)">Sarah</button>
-      <button class="filter-btn" onclick="setFilter('rep','rep2',this)">James</button>
+  <div class="topbar-stats">
+    <div class="stat-block">
+      <div>
+        <div class="stat-val" id="stat-open">—</div>
+        <div class="stat-label">Open</div>
+      </div>
     </div>
-    <div class="sidebar-section">
-      <h4>Status</h4>
-      <button class="filter-btn active" onclick="setFilter('status','all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('status','open',this)">Open</button>
-      <button class="filter-btn" onclick="setFilter('status','in_progress',this)">In progress</button>
-      <button class="filter-btn" onclick="setFilter('status','resolved',this)">Resolved</button>
+    <div class="stat-block">
+      <div>
+        <div class="stat-val urgent-val" id="stat-urgent">—</div>
+        <div class="stat-label">Urgent</div>
+      </div>
     </div>
-    <div class="sidebar-section">
-      <h4>Priority</h4>
-      <button class="filter-btn active" onclick="setFilter('priority','all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('priority','urgent',this)">Urgent</button>
-      <button class="filter-btn" onclick="setFilter('priority','high',this)">High</button>
-      <button class="filter-btn" onclick="setFilter('priority','medium',this)">Medium</button>
-      <button class="filter-btn" onclick="setFilter('priority','low',this)">Low</button>
+    <div class="stat-block">
+      <div>
+        <div class="stat-val esc-val" id="stat-esc">—</div>
+        <div class="stat-label">Escalations</div>
+      </div>
     </div>
-    <button class="process-all-btn" onclick="alert('Connect to live server to process tickets with AI')">⚡ Process All</button>
-  </aside>
-
-  <div class="ticket-list" id="ticket-list">
-    <div class="list-header">
-      <h3>Tickets</h3>
-      <span id="list-count">12 tickets</span>
+    <div class="stat-block">
+      <div>
+        <div class="stat-val" id="stat-total">—</div>
+        <div class="stat-label">Total</div>
+      </div>
     </div>
-    <div id="cards"></div>
   </div>
-
-  <div class="detail-panel empty" id="detail-panel">
-    <span>Select a ticket to view details</span>
+  <div class="topbar-right">
+    <span class="refresh-indicator" id="refresh-ind">●&nbsp;LIVE</span>
   </div>
 </div>
 
+<!-- APP SHELL -->
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Rep</div>
+      <button class="filter-btn active" data-filter="rep" data-value="">All Reps</button>
+      <button class="filter-btn" data-filter="rep" data-value="rep1">Sarah</button>
+      <button class="filter-btn" data-filter="rep" data-value="rep2">James</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status</div>
+      <button class="filter-btn active" data-filter="status" data-value="">All</button>
+      <button class="filter-btn" data-filter="status" data-value="open">Open</button>
+      <button class="filter-btn" data-filter="status" data-value="in_progress">In Progress</button>
+      <button class="filter-btn" data-filter="status" data-value="resolved">Resolved</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Priority</div>
+      <button class="filter-btn active" data-filter="priority" data-value="">All</button>
+      <button class="filter-btn" data-filter="priority" data-value="urgent">Urgent</button>
+      <button class="filter-btn" data-filter="priority" data-value="high">High</button>
+      <button class="filter-btn" data-filter="priority" data-value="medium">Medium</button>
+      <button class="filter-btn" data-filter="priority" data-value="low">Low</button>
+    </div>
+    <div class="sep"></div>
+    <div class="sidebar-cta">
+      <button class="process-btn" id="process-all-btn">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Process All
+      </button>
+    </div>
+  </aside>
+
+  <!-- TICKET LIST -->
+  <div class="list-panel">
+    <div class="list-header">
+      <span class="list-header-title">Tickets</span>
+      <span class="list-header-count" id="ticket-count">—</span>
+    </div>
+    <div class="ticket-list" id="ticket-list"></div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="0"/><line x1="3" y1="9" x2="21" y2="9"/>
+        <line x1="9" y1="21" x2="9" y2="9"/>
+      </svg>
+      <p>Select a ticket</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="overlay-spinner"></div>
+    <div class="overlay-label" id="overlay-label">Processing</div>
+    <div class="overlay-sub" id="overlay-sub">Claude is analysing this ticket...</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
 <script>
-const TICKETS = [{"id": "TKT-004", "subject": "COMPLETELY UNACCEPTABLE SERVICE - 3rd attempt to contact", "body": "This is my THIRD attempt to contact your company about this matter. I have sent two previous emails that have been completely ignored. I purchased the Thrudark Stealth Hardshell jacket six weeks ago for \u00a3380 and the waterproofing has already failed entirely. The jacket soaks through in light rain. For a brand that prides itself on military-grade quality, this is absolutely disgraceful. I expect a full refund or replacement IMMEDIATELY. If I don't hear back today I will be escalating this to Trading Standards and posting my experience across all social media platforms.\n\nFurious,\nRobert Thornton", "customer_name": "Robert Thornton", "customer_email": "r.thornton@business.co.uk", "channel": "email", "created_at": "2026-05-30T06:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-001", "subject": "Where is my order? It's been 10 days", "body": "Hi,\n\nI placed an order for the Thrudark Aegis Softshell jacket 10 days ago (order #TD-48291) and it still hasn't arrived. The tracking number shows it left the warehouse but hasn't updated since. I need this for a hiking trip in Scotland next weekend. Can you please investigate?\n\nThanks,\nMarcus", "customer_name": "Marcus Webb", "customer_email": "marcus.webb@email.com", "channel": "email", "created_at": "2026-05-30T05:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-007", "subject": "Parcel hasn't arrived - shows delivered but nothing received", "body": "Good morning,\n\nMy order TD-52107 was marked as delivered three days ago but I haven't received anything. I was home all day on the supposed delivery date. There's no parcel in my building's post room either and none of my neighbours have taken it in. The courier's tracking just says 'delivered - signed for' but I definitely didn't sign for anything. I'm quite worried about this - it was over \u00a3200 of gear. Can you help track this down?\n\nThanks,\nJames", "customer_name": "James Okafor", "customer_email": "j.okafor@techcorp.io", "channel": "ticket", "created_at": "2026-05-30T04:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-011", "subject": "Wrong item sent in my order", "body": "Hi,\n\nI received my order TD-51876 today but it contains the wrong item. I ordered the Aegis Softshell in Olive/Medium but received a Recon Fleece in Black/Large. I'm guessing there's been a packing error. I need the correct item as soon as possible as I have a trip in two weeks. What's the quickest way to resolve this? Happy to send the wrong item back.\n\nThanks,\nBen", "customer_name": "Ben Ashworth", "customer_email": "ben.ashworth@outlook.com", "channel": "ticket", "created_at": "2026-05-30T03:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-002", "subject": "Want to return my jacket - wrong size", "body": "Hello,\n\nI ordered the Thrudark Recon Fleece in size Large but it runs quite small and doesn't fit properly. I'd like to return it and exchange for an XL. The item is unused and still has all original tags attached. Order number: TD-51034. What's the process for this?\n\nBest,\nPriya", "customer_name": "Priya Sharma", "customer_email": "priya.sharma@outlook.com", "channel": "ticket", "created_at": "2026-05-30T02:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-009", "subject": "Order cancelled without explanation - extremely disappointed", "body": "I placed an order four days ago (TD-53812) and just received an email saying it's been cancelled. No reason was given. I was planning to give this as a birthday gift and the birthday is next week. I've tried calling but can't get through. This is incredibly poor customer service for a premium brand. I want to know why my order was cancelled and I want it reinstated or an explanation given immediately. Very disappointed in Thrudark.\n\nAngrily,\nHenry", "customer_name": "Henry Blackwood", "customer_email": "h.blackwood@email.com", "channel": "ticket", "created_at": "2026-05-30T01:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-003", "subject": "Which base layer is best for Scottish winter mountaineering?", "body": "Hi there,\n\nI'm planning a winter mountaineering trip to the Cairngorms in January and I'm looking for a base layer that can handle serious cold and wet conditions. I'll be doing multi-day expeditions with heavy packs. Which Thrudark base layer would you recommend? I run warm normally but these will be challenging conditions. Budget isn't a concern - I want the best.\n\nCheers,\nDuncan", "customer_name": "Duncan MacPherson", "customer_email": "d.macpherson@highland.net", "channel": "email", "created_at": "2026-05-29T23:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-005", "subject": "Zip broken after only 2 months of use", "body": "Hi,\n\nI've had my Thrudark Recon Midlayer for about two months now and the main zip has stopped working properly. The zip slides but the teeth don't engage properly and it keeps coming undone. I've used this jacket on maybe 8-10 occasions. I wouldn't normally expect this kind of failure on premium outdoor gear. Is this covered under warranty? Order reference: TD-47883.\n\nRegards,\nSophie", "customer_name": "Sophie Laurent", "customer_email": "sophie.l@gmail.com", "channel": "ticket", "created_at": "2026-05-29T17:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-006", "subject": "Just wanted to say - best outdoor gear I've ever owned", "body": "Hi Thrudark team,\n\nI just wanted to drop you a note to say how impressed I am with my recent purchases. I bought the Aegis jacket and Vanguard trousers three months ago and they've been absolutely brilliant. Used them in some genuinely horrible conditions on the Brecon Beacons and they performed flawlessly. The build quality is exceptional and you can tell real thought has gone into the design. I've already recommended Thrudark to several friends in my hiking group. Keep up the excellent work!\n\nBest wishes,\nCaroline", "customer_name": "Caroline Hughes", "customer_email": "caroline.h@webmail.com", "channel": "email", "created_at": "2026-05-29T11:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-008", "subject": "Are the Stealth trousers suitable for cycling as well as hiking?", "body": "Hi,\n\nI'm looking at the Thrudark Stealth trousers and wondering if they'd work well for both cycling commuting and weekend hiking. I need something versatile that looks reasonably smart but can handle getting wet on the bike. I cycle about 8 miles each way in all weathers. Do you have any customers who use them this way? Also, are the pockets secure enough for a phone while cycling?\n\nCheers,\nNatasha", "customer_name": "Natasha Brennan", "customer_email": "natasha.b@personalmail.com", "channel": "email", "created_at": "2026-05-29T01:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-010", "subject": "Sizing question - between sizes on the Vanguard jacket", "body": "Hello,\n\nI'm trying to decide between Medium and Large for the Vanguard hardshell jacket. I'm 5'11\", 80kg, with a 40\" chest. I'll be wearing it over a midlayer and base layer for winter use. I prefer a more athletic fit but obviously need room for layering. What would you recommend? Also, does the cut allow for good arm movement when climbing or scrambling?\n\nMany thanks,\nAlicia", "customer_name": "Alicia Torres", "customer_email": "alicia.torres@gmail.com", "channel": "email", "created_at": "2026-05-28T10:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-012", "subject": "Absolutely love the new Operator series - incredible kit", "body": "Just had to write in about the new Operator series. I served for 12 years and I've used military-issued kit in some genuinely tough conditions. The Thrudark Operator jacket is hands down the best piece of civilian outdoor kit I've ever worn - it feels like the real thing but actually better in several ways. The pocket configuration is brilliant. Just ordered a second one in different colour. You should be very proud of what you've built here. Proper kit for proper people.\n\nWith respect,\nSergeant (Ret.) Tom Gallagher", "customer_name": "Tom Gallagher", "customer_email": "t.gallagher@veterans.org.uk", "channel": "email", "created_at": "2026-05-28T07:19:22.699778", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}];
-const STATS = {"total": 12, "by_status": {"open": 12}, "by_priority": {"medium": 12}, "by_category": {}, "escalations": 0};
-const REPS = [{"id": "rep1", "name": "Sarah", "email": "sarah@thrudark.com", "active_tickets": []}, {"id": "rep2", "name": "James", "email": "james@thrudark.com", "active_tickets": []}];
 
-let filters = { rep: 'all', status: 'all', priority: 'all' };
-let selected = null;
+  // ── Static preview data (no server required) ────────────────────────────────
+  const STATIC_TICKETS = [{"id": "TKT-004", "subject": "COMPLETELY UNACCEPTABLE SERVICE - 3rd attempt to contact", "body": "This is my THIRD attempt to contact your company about this matter. I have sent two previous emails that have been completely ignored. I purchased the Thrudark Stealth Hardshell jacket six weeks ago for \u00a3380 and the waterproofing has already failed entirely. The jacket soaks through in light rain. For a brand that prides itself on military-grade quality, this is absolutely disgraceful. I expect a full refund or replacement IMMEDIATELY. If I don't hear back today I will be escalating this to Trading Standards and posting my experience across all social media platforms.\n\nFurious,\nRobert Thornton", "customer_name": "Robert Thornton", "customer_email": "r.thornton@business.co.uk", "channel": "email", "created_at": "2026-05-30T06:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-001", "subject": "Where is my order? It's been 10 days", "body": "Hi,\n\nI placed an order for the Thrudark Aegis Softshell jacket 10 days ago (order #TD-48291) and it still hasn't arrived. The tracking number shows it left the warehouse but hasn't updated since. I need this for a hiking trip in Scotland next weekend. Can you please investigate?\n\nThanks,\nMarcus", "customer_name": "Marcus Webb", "customer_email": "marcus.webb@email.com", "channel": "email", "created_at": "2026-05-30T05:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-007", "subject": "Parcel hasn't arrived - shows delivered but nothing received", "body": "Good morning,\n\nMy order TD-52107 was marked as delivered three days ago but I haven't received anything. I was home all day on the supposed delivery date. There's no parcel in my building's post room either and none of my neighbours have taken it in. The courier's tracking just says 'delivered - signed for' but I definitely didn't sign for anything. I'm quite worried about this - it was over \u00a3200 of gear. Can you help track this down?\n\nThanks,\nJames", "customer_name": "James Okafor", "customer_email": "j.okafor@techcorp.io", "channel": "ticket", "created_at": "2026-05-30T04:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-011", "subject": "Wrong item sent in my order", "body": "Hi,\n\nI received my order TD-51876 today but it contains the wrong item. I ordered the Aegis Softshell in Olive/Medium but received a Recon Fleece in Black/Large. I'm guessing there's been a packing error. I need the correct item as soon as possible as I have a trip in two weeks. What's the quickest way to resolve this? Happy to send the wrong item back.\n\nThanks,\nBen", "customer_name": "Ben Ashworth", "customer_email": "ben.ashworth@outlook.com", "channel": "ticket", "created_at": "2026-05-30T03:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-002", "subject": "Want to return my jacket - wrong size", "body": "Hello,\n\nI ordered the Thrudark Recon Fleece in size Large but it runs quite small and doesn't fit properly. I'd like to return it and exchange for an XL. The item is unused and still has all original tags attached. Order number: TD-51034. What's the process for this?\n\nBest,\nPriya", "customer_name": "Priya Sharma", "customer_email": "priya.sharma@outlook.com", "channel": "ticket", "created_at": "2026-05-30T02:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-009", "subject": "Order cancelled without explanation - extremely disappointed", "body": "I placed an order four days ago (TD-53812) and just received an email saying it's been cancelled. No reason was given. I was planning to give this as a birthday gift and the birthday is next week. I've tried calling but can't get through. This is incredibly poor customer service for a premium brand. I want to know why my order was cancelled and I want it reinstated or an explanation given immediately. Very disappointed in Thrudark.\n\nAngrily,\nHenry", "customer_name": "Henry Blackwood", "customer_email": "h.blackwood@email.com", "channel": "ticket", "created_at": "2026-05-30T01:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-003", "subject": "Which base layer is best for Scottish winter mountaineering?", "body": "Hi there,\n\nI'm planning a winter mountaineering trip to the Cairngorms in January and I'm looking for a base layer that can handle serious cold and wet conditions. I'll be doing multi-day expeditions with heavy packs. Which Thrudark base layer would you recommend? I run warm normally but these will be challenging conditions. Budget isn't a concern - I want the best.\n\nCheers,\nDuncan", "customer_name": "Duncan MacPherson", "customer_email": "d.macpherson@highland.net", "channel": "email", "created_at": "2026-05-29T23:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-005", "subject": "Zip broken after only 2 months of use", "body": "Hi,\n\nI've had my Thrudark Recon Midlayer for about two months now and the main zip has stopped working properly. The zip slides but the teeth don't engage properly and it keeps coming undone. I've used this jacket on maybe 8-10 occasions. I wouldn't normally expect this kind of failure on premium outdoor gear. Is this covered under warranty? Order reference: TD-47883.\n\nRegards,\nSophie", "customer_name": "Sophie Laurent", "customer_email": "sophie.l@gmail.com", "channel": "ticket", "created_at": "2026-05-29T17:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-006", "subject": "Just wanted to say - best outdoor gear I've ever owned", "body": "Hi Thrudark team,\n\nI just wanted to drop you a note to say how impressed I am with my recent purchases. I bought the Aegis jacket and Vanguard trousers three months ago and they've been absolutely brilliant. Used them in some genuinely horrible conditions on the Brecon Beacons and they performed flawlessly. The build quality is exceptional and you can tell real thought has gone into the design. I've already recommended Thrudark to several friends in my hiking group. Keep up the excellent work!\n\nBest wishes,\nCaroline", "customer_name": "Caroline Hughes", "customer_email": "caroline.h@webmail.com", "channel": "email", "created_at": "2026-05-29T11:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-008", "subject": "Are the Stealth trousers suitable for cycling as well as hiking?", "body": "Hi,\n\nI'm looking at the Thrudark Stealth trousers and wondering if they'd work well for both cycling commuting and weekend hiking. I need something versatile that looks reasonably smart but can handle getting wet on the bike. I cycle about 8 miles each way in all weathers. Do you have any customers who use them this way? Also, are the pockets secure enough for a phone while cycling?\n\nCheers,\nNatasha", "customer_name": "Natasha Brennan", "customer_email": "natasha.b@personalmail.com", "channel": "email", "created_at": "2026-05-29T01:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-010", "subject": "Sizing question - between sizes on the Vanguard jacket", "body": "Hello,\n\nI'm trying to decide between Medium and Large for the Vanguard hardshell jacket. I'm 5'11\", 80kg, with a 40\" chest. I'll be wearing it over a midlayer and base layer for winter use. I prefer a more athletic fit but obviously need room for layering. What would you recommend? Also, does the cut allow for good arm movement when climbing or scrambling?\n\nMany thanks,\nAlicia", "customer_name": "Alicia Torres", "customer_email": "alicia.torres@gmail.com", "channel": "email", "created_at": "2026-05-28T10:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}, {"id": "TKT-012", "subject": "Absolutely love the new Operator series - incredible kit", "body": "Just had to write in about the new Operator series. I served for 12 years and I've used military-issued kit in some genuinely tough conditions. The Thrudark Operator jacket is hands down the best piece of civilian outdoor kit I've ever worn - it feels like the real thing but actually better in several ways. The pocket configuration is brilliant. Just ordered a second one in different colour. You should be very proud of what you've built here. Proper kit for proper people.\n\nWith respect,\nSergeant (Ret.) Tom Gallagher", "customer_name": "Tom Gallagher", "customer_email": "t.gallagher@veterans.org.uk", "channel": "email", "created_at": "2026-05-28T07:33:43.068455", "status": "open", "priority": "medium", "category": null, "assigned_to": null, "escalation_flag": false, "draft_reply": null}];
+  const STATIC_STATS   = {"total": 12, "by_status": {"open": 12}, "by_priority": {"medium": 12}, "by_category": {}, "escalations": 0};
 
-function timeAgo(iso) {
-  const diff = Date.now() - new Date(iso);
-  const h = Math.floor(diff / 36e5);
-  if (h < 1) return 'just now';
-  if (h < 24) return h + 'h ago';
-  return Math.floor(h/24) + 'd ago';
-}
+  // Override fetch functions to use static data
+  async function fetchTickets() {
+    const p = new URLSearchParams();
+    if (state.filters.rep)      p.set('assigned_to', state.filters.rep);
+    if (state.filters.status)   p.set('status',      state.filters.status);
+    if (state.filters.priority) p.set('priority',    state.filters.priority);
+    let data = STATIC_TICKETS;
+    if (state.filters.rep)      data = data.filter(t => t.assigned_to === state.filters.rep);
+    if (state.filters.status)   data = data.filter(t => t.status === state.filters.status);
+    if (state.filters.priority) data = data.filter(t => t.priority === state.filters.priority);
+    state.tickets = data;
+    renderList();
+  }
 
-function repName(id) {
-  const r = REPS.find(r => r.id === id);
-  return r ? r.name : null;
-}
+  async function fetchStats() {
+    const s = STATIC_STATS;
+    document.getElementById('stat-open').textContent  = s.by_status?.open || 0;
+    document.getElementById('stat-urgent').textContent = s.by_priority?.urgent || 0;
+    document.getElementById('stat-esc').textContent   = s.escalations || 0;
+    document.getElementById('stat-total').textContent = s.total || 0;
+  }
 
-function repInitial(id) {
-  const r = REPS.find(r => r.id === id);
-  return r ? r.name[0] : '?';
-}
+  async function processTicket(id) {
+    alert('Connect to the live server (uvicorn backend.main:app) to process tickets with AI.');
+  }
 
-function setFilter(key, val, btn) {
-  filters[key] = val;
-  btn.closest('.sidebar-section').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderList();
-}
+  async function processAll() {
+    alert('Connect to the live server (uvicorn backend.main:app) to process all tickets with AI.');
+  }
 
-function renderList() {
-  const filtered = TICKETS.filter(t => {
-    if (filters.status !== 'all' && t.status !== filters.status) return false;
-    if (filters.priority !== 'all' && t.priority !== filters.priority) return false;
-    if (filters.rep !== 'all' && t.assigned_to !== filters.rep) return false;
-    return true;
-  });
-  document.getElementById('list-count').textContent = filtered.length + ' tickets';
-  document.getElementById('cards').innerHTML = filtered.map(t => `
-    <div class="ticket-card ${selected===t.id?'selected':''}" onclick="selectTicket('${t.id}')">
-      <div class="tc-top">
-        <span class="tc-name">${t.customer_name}</span>
-        <span class="badge ${t.priority}">${t.priority}</span>
-      </div>
-      <div class="tc-subject">${t.subject}</div>
-      <div class="tc-meta">
-        <span class="channel-icon">${t.channel==='email'?'📧':'🎫'}</span>
-        ${t.category ? `<span class="badge ${t.category}">${t.category.replace('_',' ')}</span>` : '<span class="badge other">unprocessed</span>'}
-        ${t.assigned_to ? `<span class="rep-tag">${repName(t.assigned_to)}</span>` : ''}
-        ${t.escalation_flag ? '<span class="esc-flag">⚠ ESC</span>' : ''}
-        <span style="margin-left:auto">${timeAgo(t.created_at)}</span>
-      </div>
-    </div>
-  `).join('');
-}
+  async function updateTicket(id, payload) {
+    // Update local state
+    const t = STATIC_TICKETS.find(t => t.id === id);
+    if (t) Object.assign(t, payload);
+    return t;
+  }
 
-function selectTicket(id) {
-  selected = id;
-  renderList();
-  const t = TICKETS.find(t => t.id === id);
-  const panel = document.getElementById('detail-panel');
-  panel.className = 'detail-panel';
-  panel.innerHTML = `
-    <div class="detail-header">
-      <div>
-        <div class="detail-title">${t.subject}</div>
-        <div class="detail-meta">
-          <span>🎫 ${t.id}</span>
-          <span>${t.channel==='email'?'📧 Email':'🎫 Ticket'}</span>
-          <span>👤 ${t.customer_name} &lt;${t.customer_email}&gt;</span>
-          <span>🕐 ${timeAgo(t.created_at)}</span>
+  const API = '';
+  const state = {
+    tickets: [],
+    selectedId: null,
+    filters: { rep: '', status: '', priority: '' }
+  };
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;');
+  }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return `${m}m`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h`;
+    return `${Math.floor(h/24)}d`;
+  }
+
+  function repName(id) {
+    if (id === 'rep1') return 'Sarah';
+    if (id === 'rep2') return 'James';
+    return '—';
+  }
+
+  function catLabel(c) {
+    return c ? c.replace(/_/g,' ') : null;
+  }
+
+  function priBadge(p) {
+    const cls = { low:'b-low', medium:'b-medium', high:'b-high', urgent:'b-urgent' }[p] || 'b-low';
+    return `<span class="badge ${cls}">${esc(p||'—')}</span>`;
+  }
+
+  function statusBadge(s) {
+    const cls = { open:'b-open', in_progress:'b-in_progress', resolved:'b-resolved' }[s] || 'b-open';
+    return `<span class="badge ${cls}">${esc((s||'').replace('_',' '))}</span>`;
+  }
+
+  function toast(msg, type='t-success') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = `toast ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  function overlay(on, label='Processing', sub='Claude is analysing this ticket...') {
+    document.getElementById('overlay').classList.toggle('on', on);
+    document.getElementById('overlay-label').textContent = label;
+    document.getElementById('overlay-sub').textContent = sub;
+  }
+
+  // ── API ──────────────────────────────────────────────────────────────────────
+
+  async function fetchTickets() {
+    const p = new URLSearchParams();
+    if (state.filters.rep)      p.set('assigned_to', state.filters.rep);
+    if (state.filters.status)   p.set('status',      state.filters.status);
+    if (state.filters.priority) p.set('priority',    state.filters.priority);
+    const r = await fetch(`${API}/api/tickets?${p}`);
+    state.tickets = await r.json();
+    renderList();
+  }
+
+  async function fetchStats() {
+    const r = await fetch(`${API}/api/stats`);
+    const s = await r.json();
+    document.getElementById('stat-open').textContent  = s.by_status?.open || 0;
+    document.getElementById('stat-urgent').textContent = s.by_priority?.urgent || 0;
+    document.getElementById('stat-esc').textContent   = s.escalations || 0;
+    document.getElementById('stat-total').textContent = s.total || 0;
+  }
+
+  async function processTicket(id) {
+    overlay(true, 'Processing Ticket', 'Claude is classifying, prioritising and drafting a reply...');
+    try {
+      const r = await fetch(`${API}/api/tickets/${id}/process`, { method:'POST' });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Failed'); }
+      await Promise.all([fetchTickets(), fetchStats()]);
+      const t = state.tickets.find(t => t.id === id);
+      if (t) renderDetail(t);
+      toast('Ticket processed');
+    } catch(e) {
+      toast(e.message, 't-error');
+    } finally {
+      overlay(false);
+    }
+  }
+
+  async function processAll() {
+    const btn = document.getElementById('process-all-btn');
+    btn.disabled = true;
+    overlay(true, 'Processing All Tickets', 'Running AI analysis across your queue...');
+    try {
+      const r = await fetch(`${API}/api/tickets/process-all`, { method:'POST' });
+      const d = await r.json();
+      await Promise.all([fetchTickets(), fetchStats()]);
+      toast(`${d.processed?.length || 0} tickets processed`);
+    } catch(e) {
+      toast('Failed: ' + e.message, 't-error');
+    } finally {
+      btn.disabled = false;
+      overlay(false);
+    }
+  }
+
+  async function updateTicket(id, payload) {
+    const r = await fetch(`${API}/api/tickets/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error('Update failed');
+    return r.json();
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+
+  function renderList() {
+    const list  = document.getElementById('ticket-list');
+    const count = document.getElementById('ticket-count');
+    count.textContent = state.tickets.length;
+
+    if (!state.tickets.length) {
+      list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--text3);font-family:var(--font-heading);font-size:11px;letter-spacing:.18em;text-transform:uppercase">No tickets</div>`;
+      return;
+    }
+
+    list.innerHTML = state.tickets.map(t => {
+      const sel = t.id === state.selectedId ? ' selected' : '';
+      const escCls = t.escalation_flag ? ' escalated' : '';
+      const cat = catLabel(t.category);
+      return `
+        <div class="ticket-card${sel}${escCls}" data-id="${t.id}" onclick="selectTicket('${t.id}')">
+          <div class="tc-row1">
+            <span class="tc-name">${esc(t.customer_name)}</span>
+            <div class="tc-badges">
+              ${t.escalation_flag ? '<span class="esc-dot" title="Escalation flagged"></span>' : ''}
+              ${priBadge(t.priority)}
+            </div>
+          </div>
+          <div class="tc-subject">${esc(t.subject)}</div>
+          <div class="tc-foot">
+            <span class="tc-channel">${t.channel === 'email' ? 'EMAIL' : 'TICKET'}</span>
+            ${cat ? `<span class="badge b-cat">${esc(cat)}</span>` : ''}
+            <span class="tc-rep">${repName(t.assigned_to)}</span>
+            <span class="tc-time">${timeAgo(t.created_at)}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function selectTicket(id) {
+    state.selectedId = id;
+    document.querySelectorAll('.ticket-card').forEach(el =>
+      el.classList.toggle('selected', el.dataset.id === id)
+    );
+    const t = state.tickets.find(t => t.id === id);
+    if (t) renderDetail(t);
+  }
+
+  function renderDetail(t) {
+    const panel = document.getElementById('detail-panel');
+    const cat = catLabel(t.category);
+
+    const escBanner = t.escalation_flag ? `
+      <div class="esc-banner">
+        <svg class="esc-banner-icon" viewBox="0 0 24 24">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <div>
+          <div class="esc-banner-label">Escalation Required</div>
+          <div class="esc-banner-reason">${esc(t.escalation_reason || 'This ticket requires immediate attention.')}</div>
         </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0">
-        <span class="badge ${t.priority}">${t.priority}</span>
-        <span class="badge ${t.status}">${t.status.replace('_',' ')}</span>
-      </div>
-    </div>
+      </div>` : '';
 
-    ${t.escalation_flag ? `<div class="esc-banner">⚠ <strong>Escalation Detected</strong> — ${t.escalation_reason||'Requires immediate attention'}</div>` : ''}
+    panel.innerHTML = `
+      <div class="detail-content">
 
-    ${t.assigned_to ? `<div class="rep-card">
-      <div class="rep-avatar">${repInitial(t.assigned_to)}</div>
-      <div class="rep-info"><div class="name">Assigned to ${repName(t.assigned_to)}</div><div class="sub">Based on ticket type and workload</div></div>
-    </div>` : ''}
+        <div class="detail-toprow">
+          <div style="flex:1;min-width:0">
+            <div class="detail-id-row">
+              <span class="detail-ticket-id">${esc(t.id)}</span>
+              <span class="detail-time">${timeAgo(t.created_at)} ago</span>
+            </div>
+            <div class="detail-title">${esc(t.subject)}</div>
+            <div class="detail-badge-row">
+              ${priBadge(t.priority)}
+              ${statusBadge(t.status)}
+              ${cat ? `<span class="badge b-cat">${esc(cat)}</span>` : ''}
+            </div>
+          </div>
+          <button class="action-process-btn" id="proc-btn" onclick="processTicket('${esc(t.id)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Process with AI
+          </button>
+        </div>
 
-    ${t.category ? `<div class="classify-grid">
-      <div class="classify-card"><div class="label">Category</div><div class="value"><span class="badge ${t.category}">${t.category.replace('_',' ')}</span></div></div>
-      <div class="classify-card"><div class="label">Priority</div><div class="value"><span class="badge ${t.priority}">${t.priority}</span></div></div>
-    </div>` : ''}
+        ${escBanner}
 
-    <div class="section-label">Customer message</div>
-    <div class="body-box">${t.body}</div>
+        <div>
+          <div class="section-heading">Customer</div>
+          <div class="info-grid">
+            <div class="info-cell">
+              <div class="info-cell-label">Name</div>
+              <div class="info-cell-val">${esc(t.customer_name)}</div>
+            </div>
+            <div class="info-cell">
+              <div class="info-cell-label">Email</div>
+              <div class="info-cell-val mono">${esc(t.customer_email)}</div>
+            </div>
+            <div class="info-cell">
+              <div class="info-cell-label">Channel</div>
+              <div class="info-cell-val">${t.channel === 'email' ? 'Email' : 'Support Ticket'}</div>
+            </div>
+            <div class="info-cell">
+              <div class="info-cell-label">Assigned To</div>
+              <div class="info-cell-val">${repName(t.assigned_to)}</div>
+            </div>
+          </div>
+        </div>
 
-    ${t.draft_reply ? `<div class="section-label">AI draft reply</div><div class="draft-box">${t.draft_reply}</div>` : ''}
+        <div>
+          <div class="section-heading">Message</div>
+          <div class="message-body">${esc(t.body)}</div>
+        </div>
 
-    <div class="action-row">
-      ${!t.category ? `<button class="btn primary" onclick="alert('Connect to live server to process with AI')">⚡ Process with AI</button>` : ''}
-      <select class="status-select"><option value="open" ${t.status==='open'?'selected':''}>Open</option><option value="in_progress" ${t.status==='in_progress'?'selected':''}>In Progress</option><option value="resolved" ${t.status==='resolved'?'selected':''}>Resolved</option></select>
-      <button class="btn secondary">Update</button>
-      ${t.status !== 'resolved' ? `<button class="btn danger">Mark Resolved</button>` : ''}
-    </div>
-  `;
-}
+        <div>
+          <div class="draft-label">
+            <div class="section-heading" style="margin:0;border:none;padding:0">Draft Reply</div>
+            ${t.draft_reply ? '<span class="draft-ai-badge">AI Generated</span>' : ''}
+          </div>
+          <textarea class="draft-reply" id="draft-input" placeholder="Process with AI to generate a draft reply...">${esc(t.draft_reply || '')}</textarea>
+        </div>
 
-// Stats bar
-document.getElementById('s-open').textContent = STATS.total || 0;
+        <div>
+          <div class="section-heading">Actions</div>
+          <div class="actions-bar">
+            <select class="status-select" id="status-sel">
+              <option value="open"        ${t.status==='open'?'selected':''}>Open</option>
+              <option value="in_progress" ${t.status==='in_progress'?'selected':''}>In Progress</option>
+              <option value="resolved"    ${t.status==='resolved'?'selected':''}>Resolved</option>
+            </select>
+            <button class="act-btn act-primary" onclick="saveUpdate('${esc(t.id)}')">Save</button>
+            ${t.status !== 'resolved'
+              ? `<button class="act-btn act-resolve" onclick="resolveTicket('${esc(t.id)}')">Mark Resolved</button>`
+              : ''}
+          </div>
+        </div>
 
-renderList();
-// Auto-select first ticket for preview
-if (TICKETS.length > 0) selectTicket(TICKETS[0].id);
+      </div>`;
+  }
+
+  // ── Actions ──────────────────────────────────────────────────────────────────
+
+  async function saveUpdate(id) {
+    const status      = document.getElementById('status-sel')?.value;
+    const draft_reply = document.getElementById('draft-input')?.value;
+    try {
+      await updateTicket(id, { status, draft_reply });
+      await Promise.all([fetchTickets(), fetchStats()]);
+      const t = state.tickets.find(t => t.id === id);
+      if (t) renderDetail(t);
+      toast('Ticket updated');
+    } catch(e) { toast(e.message, 't-error'); }
+  }
+
+  async function resolveTicket(id) {
+    try {
+      await updateTicket(id, { status: 'resolved' });
+      await Promise.all([fetchTickets(), fetchStats()]);
+      const t = state.tickets.find(t => t.id === id);
+      if (t) renderDetail(t);
+      toast('Resolved');
+    } catch(e) { toast(e.message, 't-error'); }
+  }
+
+  // ── Filters ──────────────────────────────────────────────────────────────────
+
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      state.filters[f] = btn.dataset.value;
+      document.querySelectorAll(`.filter-btn[data-filter="${f}"]`).forEach(b =>
+        b.classList.toggle('active', b.dataset.value === btn.dataset.value)
+      );
+      fetchTickets();
+    });
+  });
+
+  document.getElementById('process-all-btn').addEventListener('click', processAll);
+
+  // ── Boot ─────────────────────────────────────────────────────────────────────
+
+  async function init() {
+    await Promise.all([fetchTickets(), fetchStats()]);
+  }
+
+  init();
+  setInterval(() => { fetchTickets(); fetchStats(); }, 30000);
 </script>
 </body>
 </html>
