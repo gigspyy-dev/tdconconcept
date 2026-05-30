@@ -179,7 +179,13 @@
 
     .app-shell {
       display: flex;
+      flex-direction: column;
       height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+
+    #view-queue {
+      flex: 1;
       overflow: hidden;
     }
 
@@ -863,6 +869,371 @@
     /* ─── UTILS ────────────────────────────────────────────────────────────── */
 
     .sep { flex: 1; }
+
+    /* ─── NAV TABS ─────────────────────────────────────────────────────────── */
+
+    .nav-tabs {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border-right: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      background: none;
+      border: none;
+      border-right: 1px solid var(--border);
+      color: var(--text3);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover { color: var(--text2); background: var(--surface); }
+    .nav-tab.active { color: var(--text); background: var(--surface); border-bottom: 2px solid var(--olive-light); }
+
+    .nav-tab svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ─── DASHBOARD VIEW ───────────────────────────────────────────────────── */
+
+    .view { display: none; flex: 1; overflow: hidden; }
+    .view.active { display: flex; }
+
+    #view-dashboard {
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    .dash-body {
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .dash-section-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Stat cards row */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .stat-card {
+      background: var(--surface);
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: default;
+      transition: background 0.12s;
+    }
+
+    .stat-card:hover { background: var(--surface2); }
+
+    .stat-card-val {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 40px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .stat-card-val.c-urgent { color: var(--amber); }
+    .stat-card-val.c-esc    { color: var(--red-light); }
+    .stat-card-val.c-ok     { color: var(--green-light); }
+    .stat-card-val.c-prog   { color: var(--olive-light); }
+
+    .stat-card-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .stat-card-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    /* Two-column middle section */
+    .dash-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .dash-col { display: flex; flex-direction: column; gap: 24px; }
+
+    /* Priority bars */
+    .pri-bars { display: flex; flex-direction: column; gap: 10px; }
+
+    .pri-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pri-row-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .pri-bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--surface3);
+    }
+
+    .pri-bar-fill {
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+
+    .pri-bar-fill.urgent { background: var(--amber); }
+    .pri-bar-fill.high   { background: #c87820; }
+    .pri-bar-fill.medium { background: var(--blue-light); }
+    .pri-bar-fill.low    { background: var(--surface3); border: 1px solid var(--border2); }
+
+    .pri-row-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text3);
+      width: 18px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Category pills */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .cat-cell {
+      background: var(--surface);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cat-cell-name {
+      font-size: 12px;
+      color: var(--text2);
+      text-transform: capitalize;
+    }
+
+    .cat-cell-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--olive-light);
+    }
+
+    /* Rep workload */
+    .rep-cards { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+
+    .rep-workload-card {
+      background: var(--surface);
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .rep-avatar {
+      width: 38px;
+      height: 38px;
+      background: var(--olive-dim);
+      border: 1px solid var(--olive);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--olive-light);
+      flex-shrink: 0;
+    }
+
+    .rep-wl-name {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .rep-wl-sub {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .rep-wl-count {
+      text-align: right;
+    }
+
+    .rep-wl-num {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .rep-wl-num-label {
+      font-family: var(--font-heading);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    /* Escalation feed */
+    .esc-feed { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+
+    .esc-feed-empty {
+      background: var(--surface);
+      padding: 20px;
+      font-family: var(--font-heading);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      text-align: center;
+    }
+
+    .esc-feed-item {
+      background: var(--surface);
+      padding: 14px 16px;
+      border-left: 3px solid var(--red);
+      cursor: pointer;
+      transition: background 0.1s;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .esc-feed-item:hover { background: var(--surface2); }
+
+    .esc-feed-name {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .esc-feed-subject {
+      font-size: 12px;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .esc-feed-reason {
+      font-size: 11px;
+      color: #c07070;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .esc-feed-foot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    /* Recent tickets table */
+    .recent-table {
+      border: 1px solid var(--border);
+      background: var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .recent-table-head {
+      display: grid;
+      grid-template-columns: 1fr 2fr 90px 90px 80px;
+      gap: 0;
+      background: var(--surface2);
+      padding: 8px 14px;
+    }
+
+    .recent-th {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .recent-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr 90px 90px 80px;
+      gap: 0;
+      background: var(--surface);
+      padding: 11px 14px;
+      cursor: pointer;
+      transition: background 0.1s;
+      align-items: center;
+    }
+
+    .recent-row:hover { background: var(--surface2); }
+
+    .recent-cell {
+      font-size: 12px;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 12px;
+    }
+
+    .recent-cell.name { color: var(--text); font-weight: 600; }
+    .recent-cell.time { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
   </style>
 </head>
 <body>
@@ -873,6 +1244,17 @@
     <span class="brand-wordmark">THRU<em>DARK</em></span>
     <span class="brand-divider"></span>
     <span class="brand-module">CX Operations</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-dashboard" onclick="switchView('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-tab" id="tab-queue" onclick="switchView('queue')">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Queue
+      <span id="tab-queue-badge" style="display:none;background:var(--red-mid);color:#fff;font-size:9px;padding:1px 5px;margin-left:2px;"></span>
+    </button>
   </div>
   <div class="topbar-stats">
     <div class="stat-block">
@@ -907,6 +1289,100 @@
 
 <!-- APP SHELL -->
 <div class="app-shell">
+
+  <!-- ── DASHBOARD VIEW ──────────────────────────────────────────────────── -->
+  <div id="view-dashboard" class="view active">
+    <div class="dash-body">
+
+      <!-- Stat cards -->
+      <div>
+        <div class="dash-section-label">Overview</div>
+        <div class="stat-cards" id="dash-stat-cards">
+          <div class="stat-card"><div class="stat-card-val" id="dc-total">—</div><div class="stat-card-label">Total Tickets</div></div>
+          <div class="stat-card"><div class="stat-card-val" id="dc-open">—</div><div class="stat-card-label">Open</div><div class="stat-card-sub">Awaiting action</div></div>
+          <div class="stat-card"><div class="stat-card-val c-prog" id="dc-inprog">—</div><div class="stat-card-label">In Progress</div></div>
+          <div class="stat-card"><div class="stat-card-val c-ok" id="dc-resolved">—</div><div class="stat-card-label">Resolved</div></div>
+          <div class="stat-card"><div class="stat-card-val c-esc" id="dc-esc">—</div><div class="stat-card-label">Escalations</div><div class="stat-card-sub" id="dc-urgent-sub">— urgent</div></div>
+        </div>
+      </div>
+
+      <div class="dash-cols">
+
+        <!-- Left col -->
+        <div class="dash-col">
+
+          <!-- Priority breakdown -->
+          <div>
+            <div class="dash-section-label">Priority Breakdown</div>
+            <div class="pri-bars" id="dash-pri-bars">
+              <div class="pri-row"><span class="pri-row-label" style="color:var(--amber)">Urgent</span><div class="pri-bar-track"><div class="pri-bar-fill urgent" id="pb-urgent" style="width:0%"></div></div><span class="pri-row-count" id="pc-urgent">0</span></div>
+              <div class="pri-row"><span class="pri-row-label" style="color:#c87820">High</span><div class="pri-bar-track"><div class="pri-bar-fill high" id="pb-high" style="width:0%"></div></div><span class="pri-row-count" id="pc-high">0</span></div>
+              <div class="pri-row"><span class="pri-row-label" style="color:var(--blue-light)">Medium</span><div class="pri-bar-track"><div class="pri-bar-fill medium" id="pb-medium" style="width:0%"></div></div><span class="pri-row-count" id="pc-medium">0</span></div>
+              <div class="pri-row"><span class="pri-row-label" style="color:var(--text3)">Low</span><div class="pri-bar-track"><div class="pri-bar-fill low" id="pb-low" style="width:0%"></div></div><span class="pri-row-count" id="pc-low">0</span></div>
+            </div>
+          </div>
+
+          <!-- Category breakdown -->
+          <div>
+            <div class="dash-section-label">By Category</div>
+            <div class="cat-grid" id="dash-cat-grid">
+              <div class="cat-cell" style="background:var(--surface2);grid-column:1/-1"><span style="color:var(--text3);font-size:11px;font-family:var(--font-heading);letter-spacing:.1em;text-transform:uppercase">Loading...</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right col -->
+        <div class="dash-col">
+
+          <!-- Rep workload -->
+          <div>
+            <div class="dash-section-label">Rep Workload</div>
+            <div class="rep-cards" id="dash-rep-cards">
+              <div class="rep-workload-card">
+                <div class="rep-avatar">S</div>
+                <div><div class="rep-wl-name">Sarah</div><div class="rep-wl-sub" id="rw-sarah-sub">—</div></div>
+                <div class="rep-wl-count"><div class="rep-wl-num" id="rw-sarah-n">—</div><div class="rep-wl-num-label">Tickets</div></div>
+              </div>
+              <div class="rep-workload-card">
+                <div class="rep-avatar">J</div>
+                <div><div class="rep-wl-name">James</div><div class="rep-wl-sub" id="rw-james-sub">—</div></div>
+                <div class="rep-wl-count"><div class="rep-wl-num" id="rw-james-n">—</div><div class="rep-wl-num-label">Tickets</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Escalation feed -->
+          <div>
+            <div class="dash-section-label">Active Escalations</div>
+            <div class="esc-feed" id="dash-esc-feed">
+              <div class="esc-feed-empty">No active escalations</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Recent tickets -->
+      <div>
+        <div class="dash-section-label">Recent Tickets</div>
+        <div class="recent-table">
+          <div class="recent-table-head">
+            <span class="recent-th">Customer</span>
+            <span class="recent-th">Subject</span>
+            <span class="recent-th">Priority</span>
+            <span class="recent-th">Status</span>
+            <span class="recent-th">Received</span>
+          </div>
+          <div id="dash-recent-rows"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── QUEUE VIEW ────────────────────────────────────────────────────────── -->
+  <div id="view-queue" class="view">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -959,6 +1435,8 @@
       <p>Select a ticket</p>
     </div>
   </div>
+
+  </div><!-- end view-queue -->
 
 </div>
 
@@ -1038,22 +1516,30 @@
   // ── API ──────────────────────────────────────────────────────────────────────
 
   async function fetchTickets() {
-    const p = new URLSearchParams();
-    if (state.filters.rep)      p.set('assigned_to', state.filters.rep);
-    if (state.filters.status)   p.set('status',      state.filters.status);
-    if (state.filters.priority) p.set('priority',    state.filters.priority);
-    const r = await fetch(`${API}/api/tickets?${p}`);
-    state.tickets = await r.json();
+    // Always fetch all tickets for the dashboard, then filter client-side for the queue
+    const r = await fetch(`${API}/api/tickets`);
+    state.allTickets = await r.json();
+    applyFilters();
+  }
+
+  function applyFilters() {
+    state.tickets = state.allTickets.filter(t => {
+      if (state.filters.rep      && t.assigned_to !== state.filters.rep)    return false;
+      if (state.filters.status   && t.status      !== state.filters.status)  return false;
+      if (state.filters.priority && t.priority    !== state.filters.priority) return false;
+      return true;
+    });
     renderList();
   }
 
   async function fetchStats() {
     const r = await fetch(`${API}/api/stats`);
     const s = await r.json();
-    document.getElementById('stat-open').textContent  = s.by_status?.open || 0;
+    state.lastStats = s;
+    document.getElementById('stat-open').textContent   = s.by_status?.open || 0;
     document.getElementById('stat-urgent').textContent = s.by_priority?.urgent || 0;
-    document.getElementById('stat-esc').textContent   = s.escalations || 0;
-    document.getElementById('stat-total').textContent = s.total || 0;
+    document.getElementById('stat-esc').textContent    = s.escalations || 0;
+    document.getElementById('stat-total').textContent  = s.total || 0;
   }
 
   async function processTicket(id) {
@@ -1270,20 +1756,149 @@
       document.querySelectorAll(`.filter-btn[data-filter="${f}"]`).forEach(b =>
         b.classList.toggle('active', b.dataset.value === btn.dataset.value)
       );
-      fetchTickets();
+      applyFilters();
     });
   });
 
   document.getElementById('process-all-btn').addEventListener('click', processAll);
 
+  // ── View switching ────────────────────────────────────────────────────────────
+
+  let currentView = 'dashboard';
+
+  function switchView(v) {
+    currentView = v;
+    document.getElementById('view-dashboard').classList.toggle('active', v === 'dashboard');
+    document.getElementById('view-queue').classList.toggle('active', v === 'queue');
+    document.getElementById('tab-dashboard').classList.toggle('active', v === 'dashboard');
+    document.getElementById('tab-queue').classList.toggle('active', v === 'queue');
+    if (v === 'dashboard') renderDashboard();
+  }
+
+  // ── Dashboard render ──────────────────────────────────────────────────────────
+
+  function renderDashboard() {
+    const all = state.allTickets || state.tickets;
+    if (!all.length) return;
+
+    const stats = state.lastStats || {};
+
+    // Stat cards
+    const total    = stats.total || 0;
+    const open     = stats.by_status?.open || 0;
+    const inprog   = stats.by_status?.in_progress || 0;
+    const resolved = stats.by_status?.resolved || 0;
+    const esc      = stats.escalations || 0;
+    const urgent   = stats.by_priority?.urgent || 0;
+
+    document.getElementById('dc-total').textContent    = total;
+    document.getElementById('dc-open').textContent     = open;
+    document.getElementById('dc-inprog').textContent   = inprog;
+    document.getElementById('dc-resolved').textContent = resolved;
+    document.getElementById('dc-esc').textContent      = esc;
+    document.getElementById('dc-urgent-sub').textContent = `${urgent} urgent`;
+
+    // Queue badge on tab
+    const badge = document.getElementById('tab-queue-badge');
+    if (urgent + esc > 0) {
+      badge.textContent = urgent + esc;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Priority bars
+    const priMax = Math.max(1, total);
+    ['urgent','high','medium','low'].forEach(p => {
+      const n = stats.by_priority?.[p] || 0;
+      document.getElementById(`pb-${p}`).style.width = `${(n/priMax)*100}%`;
+      document.getElementById(`pc-${p}`).textContent = n;
+    });
+
+    // Category grid
+    const cats = stats.by_category || {};
+    const catEntries = Object.entries(cats).sort((a,b) => b[1]-a[1]);
+    const catGrid = document.getElementById('dash-cat-grid');
+    if (!catEntries.length) {
+      catGrid.innerHTML = `<div class="cat-cell" style="grid-column:1/-1;background:var(--surface)"><span class="cat-cell-name" style="color:var(--text3)">No categories yet — process tickets with AI</span></div>`;
+    } else {
+      catGrid.innerHTML = catEntries.map(([cat, n]) => `
+        <div class="cat-cell">
+          <span class="cat-cell-name">${cat.replace(/_/g,' ')}</span>
+          <span class="cat-cell-count">${n}</span>
+        </div>`).join('');
+    }
+
+    // Rep workload
+    const sarahTickets = all.filter(t => t.assigned_to === 'rep1');
+    const jamesTickets = all.filter(t => t.assigned_to === 'rep2');
+    const sarahOpen    = sarahTickets.filter(t => t.status !== 'resolved').length;
+    const jamesOpen    = jamesTickets.filter(t => t.status !== 'resolved').length;
+    const sarahEsc     = sarahTickets.filter(t => t.escalation_flag).length;
+    const jamesEsc     = jamesTickets.filter(t => t.escalation_flag).length;
+
+    document.getElementById('rw-sarah-n').textContent   = sarahTickets.length;
+    document.getElementById('rw-james-n').textContent   = jamesTickets.length;
+    document.getElementById('rw-sarah-sub').textContent = `${sarahOpen} open · ${sarahEsc} escalation${sarahEsc !== 1 ? 's' : ''}`;
+    document.getElementById('rw-james-sub').textContent = `${jamesOpen} open · ${jamesEsc} escalation${jamesEsc !== 1 ? 's' : ''}`;
+
+    // Escalation feed
+    const escTickets = all.filter(t => t.escalation_flag);
+    const escFeed = document.getElementById('dash-esc-feed');
+    if (!escTickets.length) {
+      escFeed.innerHTML = '<div class="esc-feed-empty">No active escalations</div>';
+    } else {
+      escFeed.innerHTML = escTickets.map(t => `
+        <div class="esc-feed-item" onclick="openTicket('${t.id}')">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <span class="esc-feed-name">${esc(t.customer_name)}</span>
+            <span style="display:flex;gap:4px">${priBadge(t.priority)}${statusBadge(t.status)}</span>
+          </div>
+          <div class="esc-feed-subject">${esc(t.subject)}</div>
+          ${t.escalation_reason ? `<div class="esc-feed-reason">${esc(t.escalation_reason)}</div>` : ''}
+          <div class="esc-feed-foot">
+            <span class="badge b-cat">${repName(t.assigned_to)}</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${timeAgo(t.created_at)} ago</span>
+          </div>
+        </div>`).join('');
+    }
+
+    // Recent tickets (8 most recent)
+    const recent = [...all].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 8);
+    document.getElementById('dash-recent-rows').innerHTML = recent.map(t => `
+      <div class="recent-row" onclick="openTicket('${t.id}')">
+        <span class="recent-cell name">${esc(t.customer_name)}</span>
+        <span class="recent-cell">${esc(t.subject)}</span>
+        <span class="recent-cell">${priBadge(t.priority)}</span>
+        <span class="recent-cell">${statusBadge(t.status)}</span>
+        <span class="recent-cell time">${timeAgo(t.created_at)} ago</span>
+      </div>`).join('');
+  }
+
+  // Open a ticket from the dashboard — switch to queue and select it
+  function openTicket(id) {
+    switchView('queue');
+    // Clear queue filters so the ticket is visible
+    state.filters = { rep: '', status: '', priority: '' };
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(b =>
+      b.classList.toggle('active', b.dataset.value === '')
+    );
+    fetchTickets().then(() => selectTicket(id));
+  }
+
   // ── Boot ─────────────────────────────────────────────────────────────────────
 
   async function init() {
     await Promise.all([fetchTickets(), fetchStats()]);
+    renderDashboard();
   }
 
   init();
-  setInterval(() => { fetchTickets(); fetchStats(); }, 30000);
+  setInterval(() => {
+    fetchTickets();
+    fetchStats();
+    if (currentView === 'dashboard') renderDashboard();
+  }, 30000);
 </script>
 </body>
 </html>
